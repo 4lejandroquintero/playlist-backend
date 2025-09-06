@@ -2,6 +2,8 @@ package com.playlist_backend.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.playlist_backend.exceptions.ExcepcionNegocio;
+import com.playlist_backend.exceptions.ExcepcionTecnica;
 import com.playlist_backend.models.Playlist;
 import com.playlist_backend.models.Song;
 import com.playlist_backend.repositories.PlaylistRepository;
@@ -9,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -142,4 +145,128 @@ class PlaylistServiceTest {
         assertTrue(result.isPresent());
         assertEquals("salsa", result.get().getNombre());
     }
+
+    @Test
+    void save_ShouldThrowExcepcionNegocio_WhenNameIsNull() {
+        Playlist invalid = new Playlist(null, "desc");
+        ExcepcionNegocio ex = assertThrows(ExcepcionNegocio.class, () -> service.save(invalid));
+        assertThat(ex.getMessage()).contains("no puede ser nulo");
+    }
+
+    @Test
+    void save_ShouldThrowExcepcionNegocio_WhenNameHasInvalidChars() {
+        Playlist invalid = new Playlist("Rock!!", "desc");
+        ExcepcionNegocio ex = assertThrows(ExcepcionNegocio.class, () -> service.save(invalid));
+        assertThat(ex.getMessage()).contains("caracteres inválidos");
+    }
+
+    @Test
+    void save_ShouldThrowExcepcionNegocio_WhenPlaylistExists() {
+        Playlist existing = new Playlist("Rock", "desc");
+        when(repository.existsById("Rock")).thenReturn(true);
+
+        ExcepcionNegocio ex = assertThrows(ExcepcionNegocio.class, () -> service.save(existing));
+        assertThat(ex.getMessage()).contains("ya existe");
+    }
+
+    @Test
+    void save_ShouldThrowExcepcionTecnica_WhenRepositoryFails() {
+        when(repository.existsById(any())).thenReturn(false);
+        when(repository.save(any())).thenThrow(new RuntimeException("DB error"));
+
+        Playlist p = new Playlist("Jazz", "desc");
+        ExcepcionTecnica ex = assertThrows(ExcepcionTecnica.class, () -> service.save(p));
+        assertThat(ex.getMessage()).contains("Error al guardar");
+    }
+
+    @Test
+    void addSongToPlaylist_ShouldThrowExcepcionNegocio_WhenListNotFound() {
+        when(repository.findById("NoExiste")).thenReturn(Optional.empty());
+        Song song = new Song();
+        song.setTitulo("Test");
+
+        ExcepcionNegocio ex = assertThrows(ExcepcionNegocio.class, () ->
+                service.addSongToPlaylist("NoExiste", song));
+        assertThat(ex.getMessage()).contains("Lista no encontrada");
+    }
+
+    @Test
+    void addSongToPlaylist_ShouldThrowExcepcionNegocio_WhenSongAlreadyExists() {
+        Song existing = new Song();
+        existing.setTitulo("Highway to Hell");
+        playlist.setCanciones(List.of(existing));
+        when(repository.findById("Rock")).thenReturn(Optional.of(playlist));
+
+        Song duplicate = new Song();
+        duplicate.setTitulo("Highway to Hell");
+
+        ExcepcionNegocio ex = assertThrows(ExcepcionNegocio.class, () ->
+                service.addSongToPlaylist("Rock", duplicate));
+        assertThat(ex.getMessage()).contains("ya está en la lista");
+    }
+
+    @Test
+    void deleteByName_ShouldThrowExcepcionNegocio_WhenListNotFound() {
+        when(repository.existsById("NoExiste")).thenReturn(false);
+
+        ExcepcionNegocio ex = assertThrows(ExcepcionNegocio.class, () -> service.deleteByName("NoExiste"));
+        assertThat(ex.getMessage()).contains("Lista no encontrada");
+    }
+
+    @Test
+    void addSongToPlaylist_ShouldThrowExcepcionTecnica_WhenRepositoryFails() {
+        Song song = new Song();
+        song.setTitulo("New Song");
+        when(repository.findById("Rock")).thenReturn(Optional.of(playlist));
+        doThrow(new RuntimeException("DB fail")).when(repository).save(any());
+
+        ExcepcionTecnica ex = assertThrows(ExcepcionTecnica.class,
+                () -> service.addSongToPlaylist("Rock", song));
+
+        assertThat(ex.getMessage()).contains("Error al agregar");
+    }
+
+    @Test
+    void getByName_ShouldThrowExcepcionNegocio_WhenPlaylistNotFound() {
+        when(repository.findById("NoExiste")).thenReturn(Optional.empty());
+
+        ExcepcionNegocio ex = assertThrows(ExcepcionNegocio.class,
+                () -> service.getByName("NoExiste"));
+
+        assertThat(ex.getMessage()).contains("Lista no encontrada");
+    }
+
+    @Test
+    void deleteByName_ShouldThrowExcepcionTecnica_WhenRepositoryFails() {
+        when(repository.existsById("Rock")).thenReturn(true);
+        doThrow(new RuntimeException("DB fail")).when(repository).deleteById("Rock");
+
+        ExcepcionTecnica ex = assertThrows(ExcepcionTecnica.class,
+                () -> service.deleteByName("Rock"));
+
+        assertThat(ex.getMessage()).contains("Error al eliminar");
+    }
+
+    @Test
+    void addSongToPlaylist_ShouldAddSong() {
+        PlaylistRepository repository = mock(PlaylistRepository.class);
+        PlaylistService service = new PlaylistService(repository);
+
+        Playlist playlist = new Playlist("Pop", "Lista pop 2025");
+        playlist.setCanciones(new ArrayList<>());
+
+        when(repository.findById("Pop")).thenReturn(Optional.of(playlist));
+        when(repository.save(any(Playlist.class))).thenAnswer(i -> i.getArgument(0));
+
+        Song song = new Song("Levitating", "Dua Lipa", "Future Nostalgia", "2020", "Pop");
+
+        Playlist updated = service.addSongToPlaylist("Pop", song);
+
+        assertThat(updated.getCanciones()).hasSize(1);
+        assertThat(updated.getCanciones().get(0).getTitulo()).isEqualTo("Levitating");
+        assertThat(updated.getCanciones().get(0).getPlaylist().getNombre()).isEqualTo("Pop");
+
+        verify(repository).save(updated);
+    }
+
 }
