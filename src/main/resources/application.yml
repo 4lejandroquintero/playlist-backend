@@ -1,0 +1,4 @@
+security:
+  default-passwords:
+    admin: admin123
+    alejo: alejo123

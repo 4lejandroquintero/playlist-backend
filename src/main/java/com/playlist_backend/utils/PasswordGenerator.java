@@ -1,21 +1,28 @@
 package com.playlist_backend.utils;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+@SpringBootApplication
 public class PasswordGenerator {
 
+    @Value("${security.default-passwords.admin}")
+    private String adminPassword;
+
+    @Value("${security.default-passwords.alejo}")
+    private String alejoPassword;
+
     public static void main(String[] args) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        var context = SpringApplication.run(PasswordGenerator.class, args);
+        PasswordGenerator generator = context.getBean(PasswordGenerator.class);
+        generator.generateHashes();
+    }
 
-        String adminPassword = "admin123";
-        String alejoPassword = "alejo123";
-
-        // Genera los hashes
-        String adminHash = encoder.encode(adminPassword);
-        String alejoHash = encoder.encode(alejoPassword);
-
-        // Imprime solo los hashes
-        System.out.println("Hash para admin: " + adminHash);
-        System.out.println("Hash para alejo: " + alejoHash);
+    public void generateHashes() {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+        System.out.println("Hash admin: " + encoder.encode(adminPassword));
+        System.out.println("Hash alejo: " + encoder.encode(alejoPassword));
     }
 }
