@@ -42,5 +42,6 @@ public class PlaylistService {
 
     public boolean exists(String nombre) { return repository.existsById(nombre); }
 
+    public List<Playlist> findByNameContaining(String name) { return repository.findByNombreContainingIgnoreCase(name); }
 
 }

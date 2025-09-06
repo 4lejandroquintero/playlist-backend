@@ -67,6 +67,11 @@ public class PlaylistController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lista no encontrada"));
     }
 
+    @GetMapping("/search")
+    public List<Playlist> search(@RequestParam String name) {
+        return service.findByNameContaining(name);
+    }
+
     @DeleteMapping("/{listName}")
     public ResponseEntity<?> delete(@PathVariable String listName) {
         if (!service.exists(listName)) {

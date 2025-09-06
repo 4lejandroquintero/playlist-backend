@@ -10,6 +10,7 @@ import java.util.*;
 @Data
 @Entity
 public class Playlist {
+
     @Id
     private String nombre;
 
