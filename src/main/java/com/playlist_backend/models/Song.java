@@ -11,6 +11,7 @@ import java.util.Objects;
 @Entity
 @NoArgsConstructor
 public class Song {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,10 +23,9 @@ public class Song {
     private String genero;
 
     @ManyToOne
-    @JoinColumn(name = "playlist_id")
+    @JoinColumn(name = "playlist_nombre")
     @JsonBackReference
     private Playlist playlist;
-
 
     public Song(String titulo, String artista, String album, String anno, String genero) {
         this.titulo = titulo;

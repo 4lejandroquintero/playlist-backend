@@ -80,6 +80,14 @@ public class PlaylistService {
         }
     }
 
+    public boolean exists(String nombre) {
+        return repository.existsById(nombre);
+    }
+
+    public Optional<Playlist> findByName(String nombre) {
+        return repository.findById(nombre);
+    }
+
     public List<Playlist> findByNameContaining(String name) {
         return repository.findByNombreContainingIgnoreCase(name);
     }

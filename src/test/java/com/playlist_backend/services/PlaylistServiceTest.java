@@ -63,6 +63,8 @@ class PlaylistServiceTest {
 
     @Test
     void deleteByName_ShouldCallRepositoryDeleteById() {
+        when(repository.existsById("Rock")).thenReturn(true);
+
         service.deleteByName("Rock");
 
         verify(repository).deleteById("Rock");
