@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.*;
 
 @Data
 @Entity
+@NoArgsConstructor
 public class Playlist {
 
     @Id
@@ -20,8 +22,6 @@ public class Playlist {
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Song> canciones = new ArrayList<>();
-
-    public Playlist() {}
 
     public Playlist(String nombre, String descripcion) {
         this.nombre = nombre;

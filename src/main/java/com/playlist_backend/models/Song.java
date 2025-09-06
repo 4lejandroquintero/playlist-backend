@@ -3,11 +3,13 @@ package com.playlist_backend.models;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
 @Data
 @Entity
+@NoArgsConstructor
 public class Song {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +26,6 @@ public class Song {
     @JsonBackReference
     private Playlist playlist;
 
-    public Song() {}
 
     public Song(String titulo, String artista, String album, String anno, String genero) {
         this.titulo = titulo;

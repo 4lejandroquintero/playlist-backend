@@ -1,5 +1,6 @@
 package com.playlist_backend.services;
 
+import com.playlist_backend.exceptions.ExcepcionNegocio;
 import com.playlist_backend.models.Playlist;
 import com.playlist_backend.repositories.PlaylistRepository;
 import org.springframework.stereotype.Service;
@@ -16,19 +17,19 @@ public class PlaylistService {
         this.repository = repository;
     }
 
-    public Playlist save(Playlist p) {
-        if (p.getNombre() == null || p.getNombre().isBlank()) {
+    public Playlist save(Playlist playlist) {
+        if (playlist.getNombre() == null || playlist.getNombre().isBlank()) {
             throw new IllegalArgumentException("El nombre de la lista no puede ser nulo o vacío");
         }
 
-        if (repository.existsById(p.getNombre())) {
+        if (repository.existsById(playlist.getNombre())) {
             throw new IllegalStateException("La lista ya existe");
         }
-        if (!p.getNombre().matches("[a-zA-Z0-9 ]+")) {
+        if (!playlist.getNombre().matches("[a-zA-Z0-9 ]+")) {
             throw new IllegalArgumentException("El nombre contiene caracteres inválidos");
         }
 
-        return repository.save(p);
+        return repository.save(playlist);
     }
 
     public List<Playlist> findAll() {
@@ -40,6 +41,9 @@ public class PlaylistService {
     }
 
     public void deleteByName(String nombre) {
+        if (!exists(nombre)) {
+            throw new ExcepcionNegocio("Lista no encontrada");
+        }
         repository.deleteById(nombre);
     }
 

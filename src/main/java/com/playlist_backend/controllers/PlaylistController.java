@@ -80,10 +80,7 @@ public class PlaylistController {
     }
 
     @DeleteMapping("/{listName}")
-    public ResponseEntity<?> delete(@PathVariable String listName) {
-        if (!service.exists(listName)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lista no encontrada");
-        }
+    public ResponseEntity<Void> delete(@PathVariable String listName) {
         service.deleteByName(listName);
         return ResponseEntity.noContent().build();
     }
