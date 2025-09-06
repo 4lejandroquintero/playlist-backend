@@ -24,35 +24,42 @@ public class PlaylistController {
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Playlist playlist) {
-        if (playlist.getNombre() == null || playlist.getNombre().isBlank()) {
-            return ResponseEntity.badRequest().body("El nombre de la lista no puede ser nulo o vacío");
+        try {
+            Playlist saved = service.save(playlist);
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{name}")
+                    .buildAndExpand(saved.getNombre())
+                    .toUri();
+            return ResponseEntity.created(location).body(saved);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
-        if (service.exists(playlist.getNombre())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("La lista ya existe");
-        }
-
-
-        Playlist saved = service.save(playlist);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{name}")
-                .buildAndExpand(saved.getNombre())
-                .toUri();
-        return ResponseEntity.created(location).body(saved);
     }
 
     @PostMapping("/{listName}/songs")
-    public ResponseEntity<Playlist> addSongToPlaylist(
+    public ResponseEntity<?> addSongToPlaylist(
             @PathVariable String listName,
             @RequestBody Song song
     ) {
         return service.findByName(listName)
                 .map(playlist -> {
+                    // Validación: no permitir canciones repetidas
+                    boolean exists = playlist.getCanciones().stream()
+                            .anyMatch(s -> s.getTitulo().equalsIgnoreCase(song.getTitulo()));
+                    if (exists) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body("La canción ya está en la lista");
+                    }
+
                     song.setPlaylist(playlist);
                     playlist.getCanciones().add(song);
                     Playlist updated = service.save(playlist);
                     return ResponseEntity.ok(updated);
                 })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Lista no encontrada"));
     }
 
     @GetMapping

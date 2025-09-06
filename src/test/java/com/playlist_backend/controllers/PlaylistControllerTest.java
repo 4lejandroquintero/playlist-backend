@@ -72,22 +72,26 @@ class PlaylistControllerTest {
         when(service.findByName("Rock Classics")).thenReturn(Optional.of(playlist));
         when(service.save(any())).thenReturn(playlist);
 
-        ResponseEntity<Playlist> response = controller.addSongToPlaylist("Rock Classics", song);
+        ResponseEntity<?> response = controller.addSongToPlaylist("Rock Classics", song);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getCanciones()).contains(song);
+        assertThat(response.getBody()).isInstanceOf(Playlist.class);
+
+        Playlist updatedPlaylist = (Playlist) response.getBody();
+        assertThat(updatedPlaylist.getCanciones()).contains(song);
 
         ArgumentCaptor<Playlist> captor = ArgumentCaptor.forClass(Playlist.class);
         verify(service).save(captor.capture());
         assertThat(captor.getValue().getCanciones()).contains(song);
     }
 
+
     @Test
     void addSongToPlaylist_ShouldReturnNotFound_WhenPlaylistDoesNotExist() {
         Song song = new Song();
         when(service.findByName("Unknown")).thenReturn(Optional.empty());
 
-        ResponseEntity<Playlist> response = controller.addSongToPlaylist("Unknown", song);
+        ResponseEntity<?> response = controller.addSongToPlaylist("Unknown", song);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         verify(service).findByName("Unknown");
