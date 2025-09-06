@@ -71,7 +71,8 @@ Antes de ejecutar el proyecto, se requiere:
 4. Acceder a la aplicación en el navegador en los puertos configurados.
 
 > Nota: Revisar los archivos de configuración que ya existen en el proyecto para asegurar la correcta conexión a la base de datos y servicios.
-> Usar sus credenciales de postgres en el application.properties.
+> Usar sus credenciales de postgres en el application.properties. (revisar para editar password)
+> Crear BD en postgres con el nombre de -- dbplaylists --.
 
 ---
 
