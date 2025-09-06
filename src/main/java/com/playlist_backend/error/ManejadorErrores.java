@@ -1,7 +1,7 @@
 package com.playlist_backend.error;
 
-import com.playlist_backend.exceptions.ExcepcionNegocio;
-import com.playlist_backend.exceptions.ExcepcionTecnica;
+import com.playlist_backend.excepciones.ExcepcionNegocio;
+import com.playlist_backend.excepciones.ExcepcionTecnica;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

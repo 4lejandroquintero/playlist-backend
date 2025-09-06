@@ -1,21 +1,21 @@
-package com.playlist_backend.services;
+package com.playlist_backend.servicios;
 
-import com.playlist_backend.exceptions.ExcepcionNegocio;
-import com.playlist_backend.exceptions.ExcepcionTecnica;
-import com.playlist_backend.models.Playlist;
-import com.playlist_backend.models.Song;
-import com.playlist_backend.repositories.PlaylistRepository;
+import com.playlist_backend.excepciones.ExcepcionNegocio;
+import com.playlist_backend.excepciones.ExcepcionTecnica;
+import com.playlist_backend.modelos.Playlist;
+import com.playlist_backend.modelos.Cancion;
+import com.playlist_backend.repositorios.RepositorioPlaylist;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PlaylistService {
+public class ServicioPlaylist {
 
-    private final PlaylistRepository repository;
+    private final RepositorioPlaylist repository;
 
-    public PlaylistService(PlaylistRepository repository) {
+    public ServicioPlaylist(RepositorioPlaylist repository) {
         this.repository = repository;
     }
 
@@ -40,18 +40,18 @@ public class PlaylistService {
         }
     }
 
-    public Playlist addSongToPlaylist(String listName, Song song) {
+    public Playlist addSongToPlaylist(String listName, Cancion cancion) {
         Playlist playlist = repository.findById(listName)
                 .orElseThrow(() -> new ExcepcionNegocio("Lista no encontrada"));
 
         boolean exists = playlist.getCanciones().stream()
-                .anyMatch(s -> s.getTitulo().equalsIgnoreCase(song.getTitulo()));
+                .anyMatch(s -> s.getTitulo().equalsIgnoreCase(cancion.getTitulo()));
         if (exists) {
             throw new ExcepcionNegocio("La canción ya está en la lista");
         }
 
-        song.setPlaylist(playlist);
-        playlist.getCanciones().add(song);
+        cancion.setPlaylist(playlist);
+        playlist.getCanciones().add(cancion);
 
         try {
             return repository.save(playlist);

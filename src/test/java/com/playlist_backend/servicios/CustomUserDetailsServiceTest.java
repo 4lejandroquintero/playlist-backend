@@ -1,7 +1,7 @@
-package com.playlist_backend.services;
+package com.playlist_backend.servicios;
 
-import com.playlist_backend.models.User;
-import com.playlist_backend.repositories.UserRepository;
+import com.playlist_backend.modelos.User;
+import com.playlist_backend.repositorios.RepositorioUsuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 class CustomUserDetailsServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private RepositorioUsuario repositorioUsuario;
 
     @InjectMocks
     private CustomUserDetailsService customUserDetailsService;
@@ -36,7 +36,7 @@ class CustomUserDetailsServiceTest {
         user.setPassword("12345");
         user.setRole("ROLE_USER");
 
-        when(userRepository.findByUsername("alejo"))
+        when(repositorioUsuario.findByUsername("alejo"))
                 .thenReturn(Optional.of(user));
 
         // Act
@@ -49,20 +49,20 @@ class CustomUserDetailsServiceTest {
         assertTrue(result.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_USER")));
 
-        verify(userRepository, times(1)).findByUsername("alejo");
+        verify(repositorioUsuario, times(1)).findByUsername("alejo");
     }
 
     @Test
     void loadUserByUsername_UserNotFound_ThrowsException() {
         // Arrange
-        when(userRepository.findByUsername("noexiste"))
+        when(repositorioUsuario.findByUsername("noexiste"))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(UsernameNotFoundException.class,
                 () -> customUserDetailsService.loadUserByUsername("noexiste"));
 
-        verify(userRepository, times(1)).findByUsername("noexiste");
+        verify(repositorioUsuario, times(1)).findByUsername("noexiste");
     }
 
 

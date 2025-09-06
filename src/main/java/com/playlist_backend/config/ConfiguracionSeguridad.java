@@ -1,6 +1,6 @@
 package com.playlist_backend.config;
 
-import com.playlist_backend.services.CustomUserDetailsService;
+import com.playlist_backend.servicios.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,11 +13,11 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class ConfiguracionSeguridad {
 
     private final CustomUserDetailsService userDetailsService;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+    public ConfiguracionSeguridad(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 

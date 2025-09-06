@@ -1,4 +1,4 @@
-package com.playlist_backend.utils;
+package com.playlist_backend.utiles;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.beans.factory.annotation.Value;
@@ -6,7 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PasswordGenerator {
+public class GeneradorContrasena {
 
     @Value("${security.default-passwords.admin}")
     private String adminPassword;
@@ -15,8 +15,8 @@ public class PasswordGenerator {
     private String alejoPassword;
 
     public static void main(String[] args) {
-        var context = SpringApplication.run(PasswordGenerator.class, args);
-        PasswordGenerator generator = context.getBean(PasswordGenerator.class);
+        var context = SpringApplication.run(GeneradorContrasena.class, args);
+        GeneradorContrasena generator = context.getBean(GeneradorContrasena.class);
         generator.generateHashes();
     }
 

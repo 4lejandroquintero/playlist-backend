@@ -1,4 +1,4 @@
-package com.playlist_backend.models;
+package com.playlist_backend.modelos;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -10,7 +10,7 @@ import java.util.Objects;
 @Data
 @Entity
 @NoArgsConstructor
-public class Song {
+public class Cancion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class Song {
     @JsonBackReference
     private Playlist playlist;
 
-    public Song(String titulo, String artista, String album, String anno, String genero) {
+    public Cancion(String titulo, String artista, String album, String anno, String genero) {
         this.titulo = titulo;
         this.artista = artista;
         this.album = album;
@@ -38,9 +38,9 @@ public class Song {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Song)) return false;
-        Song song = (Song) o;
-        return Objects.equals(id, song.id);
+        if (!(o instanceof Cancion)) return false;
+        Cancion cancion = (Cancion) o;
+        return Objects.equals(id, cancion.id);
     }
 
     @Override

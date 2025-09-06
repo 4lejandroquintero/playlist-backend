@@ -1,9 +1,8 @@
-package com.playlist_backend.controllers;
+package com.playlist_backend.controladores;
 
-import com.playlist_backend.models.Playlist;
-import com.playlist_backend.models.Song;
-import com.playlist_backend.services.PlaylistService;
-import org.springframework.http.HttpStatus;
+import com.playlist_backend.modelos.Playlist;
+import com.playlist_backend.modelos.Cancion;
+import com.playlist_backend.servicios.ServicioPlaylist;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -14,11 +13,11 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/lists")
-public class PlaylistController {
+public class PlaylistControlador {
 
-    private final PlaylistService service;
+    private final ServicioPlaylist service;
 
-    public PlaylistController(PlaylistService service) {
+    public PlaylistControlador(ServicioPlaylist service) {
         this.service = service;
     }
 
@@ -35,9 +34,9 @@ public class PlaylistController {
     @PostMapping("/{listName}/songs")
     public ResponseEntity<Playlist> addSongToPlaylist(
             @PathVariable String listName,
-            @RequestBody Song song
+            @RequestBody Cancion cancion
     ) {
-        Playlist updated = service.addSongToPlaylist(listName, song);
+        Playlist updated = service.addSongToPlaylist(listName, cancion);
         return ResponseEntity.ok(updated);
     }
 

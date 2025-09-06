@@ -1,4 +1,4 @@
-package com.playlist_backend.models;
+package com.playlist_backend.modelos;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -21,14 +21,14 @@ public class Playlist {
     @Getter
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<Song> canciones = new ArrayList<>();
+    private List<Cancion> canciones = new ArrayList<>();
 
     public Playlist(String nombre, String descripcion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
     }
 
-    public void setCanciones(List<Song> canciones) {
+    public void setCanciones(List<Cancion> canciones) {
         this.canciones.clear();
         if (canciones != null) {
             canciones.forEach(c -> c.setPlaylist(this));

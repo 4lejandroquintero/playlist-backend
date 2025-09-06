@@ -1,4 +1,4 @@
-package com.playlist_backend.models;
+package com.playlist_backend.modelos;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

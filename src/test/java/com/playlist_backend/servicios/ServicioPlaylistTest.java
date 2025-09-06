@@ -1,12 +1,12 @@
-package com.playlist_backend.services;
+package com.playlist_backend.servicios;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.playlist_backend.exceptions.ExcepcionNegocio;
-import com.playlist_backend.exceptions.ExcepcionTecnica;
-import com.playlist_backend.models.Playlist;
-import com.playlist_backend.models.Song;
-import com.playlist_backend.repositories.PlaylistRepository;
+import com.playlist_backend.excepciones.ExcepcionNegocio;
+import com.playlist_backend.excepciones.ExcepcionTecnica;
+import com.playlist_backend.modelos.Playlist;
+import com.playlist_backend.modelos.Cancion;
+import com.playlist_backend.repositorios.RepositorioPlaylist;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -18,13 +18,13 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-class PlaylistServiceTest {
+class ServicioPlaylistTest {
 
     @Mock
-    private PlaylistRepository repository;
+    private RepositorioPlaylist repository;
 
     @InjectMocks
-    private PlaylistService service;
+    private ServicioPlaylist service;
 
     private Playlist playlist;
 
@@ -108,10 +108,10 @@ class PlaylistServiceTest {
     void savePlaylist_WithSongs_ShouldSetPlaylistReference() {
         Playlist playlist = new Playlist("rock", "clasicos");
 
-        Song song = new Song();
-        song.setTitulo("Highway to Hell");
+        Cancion cancion = new Cancion();
+        cancion.setTitulo("Highway to Hell");
 
-        playlist.setCanciones(List.of(song));
+        playlist.setCanciones(List.of(cancion));
 
         when(repository.save(playlist)).thenReturn(playlist);
 
@@ -182,22 +182,22 @@ class PlaylistServiceTest {
     @Test
     void addSongToPlaylist_ShouldThrowExcepcionNegocio_WhenListNotFound() {
         when(repository.findById("NoExiste")).thenReturn(Optional.empty());
-        Song song = new Song();
-        song.setTitulo("Test");
+        Cancion cancion = new Cancion();
+        cancion.setTitulo("Test");
 
         ExcepcionNegocio ex = assertThrows(ExcepcionNegocio.class, () ->
-                service.addSongToPlaylist("NoExiste", song));
+                service.addSongToPlaylist("NoExiste", cancion));
         assertThat(ex.getMessage()).contains("Lista no encontrada");
     }
 
     @Test
     void addSongToPlaylist_ShouldThrowExcepcionNegocio_WhenSongAlreadyExists() {
-        Song existing = new Song();
+        Cancion existing = new Cancion();
         existing.setTitulo("Highway to Hell");
         playlist.setCanciones(List.of(existing));
         when(repository.findById("Rock")).thenReturn(Optional.of(playlist));
 
-        Song duplicate = new Song();
+        Cancion duplicate = new Cancion();
         duplicate.setTitulo("Highway to Hell");
 
         ExcepcionNegocio ex = assertThrows(ExcepcionNegocio.class, () ->
@@ -215,13 +215,13 @@ class PlaylistServiceTest {
 
     @Test
     void addSongToPlaylist_ShouldThrowExcepcionTecnica_WhenRepositoryFails() {
-        Song song = new Song();
-        song.setTitulo("New Song");
+        Cancion cancion = new Cancion();
+        cancion.setTitulo("New Song");
         when(repository.findById("Rock")).thenReturn(Optional.of(playlist));
         doThrow(new RuntimeException("DB fail")).when(repository).save(any());
 
         ExcepcionTecnica ex = assertThrows(ExcepcionTecnica.class,
-                () -> service.addSongToPlaylist("Rock", song));
+                () -> service.addSongToPlaylist("Rock", cancion));
 
         assertThat(ex.getMessage()).contains("Error al agregar");
     }
@@ -249,8 +249,8 @@ class PlaylistServiceTest {
 
     @Test
     void addSongToPlaylist_ShouldAddSong() {
-        PlaylistRepository repository = mock(PlaylistRepository.class);
-        PlaylistService service = new PlaylistService(repository);
+        RepositorioPlaylist repository = mock(RepositorioPlaylist.class);
+        ServicioPlaylist service = new ServicioPlaylist(repository);
 
         Playlist playlist = new Playlist("Pop", "Lista pop 2025");
         playlist.setCanciones(new ArrayList<>());
@@ -258,9 +258,9 @@ class PlaylistServiceTest {
         when(repository.findById("Pop")).thenReturn(Optional.of(playlist));
         when(repository.save(any(Playlist.class))).thenAnswer(i -> i.getArgument(0));
 
-        Song song = new Song("Levitating", "Dua Lipa", "Future Nostalgia", "2020", "Pop");
+        Cancion cancion = new Cancion("Levitating", "Dua Lipa", "Future Nostalgia", "2020", "Pop");
 
-        Playlist updated = service.addSongToPlaylist("Pop", song);
+        Playlist updated = service.addSongToPlaylist("Pop", cancion);
 
         assertThat(updated.getCanciones()).hasSize(1);
         assertThat(updated.getCanciones().get(0).getTitulo()).isEqualTo("Levitating");
