@@ -118,7 +118,7 @@ Todos los endpoints están bajo la ruta base: `/lists`
 | GET    | `/lists/search?name={name}`     | Buscar playlists cuyo nombre contenga un texto       | Query param: `name`                            | Lista de playlists         |
 | DELETE | `/lists/{listName}`             | Eliminar una playlist por su nombre                   | -                                             | 204 No Content             |
 
-> ⚠ Nota: Todos los endpoints permiten **CORS** desde `http://localhost:4200` para que Angular pueda consumirlos sin problemas.
+>  Nota: Todos los endpoints permiten **CORS** desde `http://localhost:4200` para que Angular pueda consumirlos sin problemas.
 
 ---
 
