@@ -119,7 +119,7 @@ Todos los endpoints están bajo la ruta base: `/lists`
 | DELETE | `/lists/{listName}`             | Eliminar una playlist por su nombre                   | -                                             | 204 No Content             |
 
 >  Nota: Todos los endpoints permiten **CORS** desde `http://localhost:4200` para que Angular pueda consumirlos sin problemas.
-
+>  También tiene swagger `http://localhost:8080/swagger-ui/index.html#/` .
 ---
 
 ##  Notas finales
