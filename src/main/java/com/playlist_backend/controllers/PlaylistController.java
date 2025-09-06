@@ -23,43 +23,22 @@ public class PlaylistController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Playlist playlist) {
-        try {
-            Playlist saved = service.save(playlist);
-            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{name}")
-                    .buildAndExpand(saved.getNombre())
-                    .toUri();
-            return ResponseEntity.created(location).body(saved);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+    public ResponseEntity<Playlist> create(@RequestBody Playlist playlist) {
+        Playlist saved = service.save(playlist);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{name}")
+                .buildAndExpand(saved.getNombre())
+                .toUri();
+        return ResponseEntity.created(location).body(saved);
     }
 
     @PostMapping("/{listName}/songs")
-    public ResponseEntity<?> addSongToPlaylist(
+    public ResponseEntity<Playlist> addSongToPlaylist(
             @PathVariable String listName,
             @RequestBody Song song
     ) {
-        return service.findByName(listName)
-                .map(playlist -> {
-                    // Validación: no permitir canciones repetidas
-                    boolean exists = playlist.getCanciones().stream()
-                            .anyMatch(s -> s.getTitulo().equalsIgnoreCase(song.getTitulo()));
-                    if (exists) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT)
-                                .body("La canción ya está en la lista");
-                    }
-
-                    song.setPlaylist(playlist);
-                    playlist.getCanciones().add(song);
-                    Playlist updated = service.save(playlist);
-                    return ResponseEntity.ok(updated);
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Lista no encontrada"));
+        Playlist updated = service.addSongToPlaylist(listName, song);
+        return ResponseEntity.ok(updated);
     }
 
     @GetMapping
@@ -68,10 +47,9 @@ public class PlaylistController {
     }
 
     @GetMapping("/{listName}")
-    public ResponseEntity<?> getOne(@PathVariable String listName) {
-        return service.findByName(listName)
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lista no encontrada"));
+    public ResponseEntity<Playlist> getOne(@PathVariable String listName) {
+        Playlist playlist = service.getByName(listName);
+        return ResponseEntity.ok(playlist);
     }
 
     @GetMapping("/search")
