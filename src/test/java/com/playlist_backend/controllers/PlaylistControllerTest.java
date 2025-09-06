@@ -45,23 +45,24 @@ class PlaylistControllerTest {
         Playlist invalid = new Playlist();
         invalid.setNombre("  ");
 
+        when(service.save(invalid))
+                .thenThrow(new IllegalArgumentException("El nombre de la lista no puede ser nulo o vacío"));
+
         ResponseEntity<?> response = controller.create(invalid);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo("El nombre de la lista no puede ser nulo o vacío");
-        verifyNoInteractions(service);
     }
 
     @Test
     void create_ShouldReturnConflict_WhenPlaylistAlreadyExists() {
-        when(service.exists("Rock Classics")).thenReturn(true);
+        when(service.save(playlist))
+                .thenThrow(new IllegalStateException("La lista ya existe"));
 
         ResponseEntity<?> response = controller.create(playlist);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(response.getBody()).isEqualTo("La lista ya existe");
-        verify(service).exists("Rock Classics");
-        verifyNoMoreInteractions(service);
     }
 
     @Test
